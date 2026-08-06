@@ -2,56 +2,74 @@
  * For more details on how to configure Wrangler, refer to:
  * https://developers.cloudflare.com/workers/wrangler/configuration/
  */
-/**
- * For more details on how to configure Wrangler, refer to:
- * https://developers.cloudflare.com/workers/wrangler/configuration/
- */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
+
 	"name": "waitlist",
 	"main": ".open-next/worker.js",
+
 	"compatibility_date": "2026-08-03",
+
 	"compatibility_flags": [
 		"nodejs_compat",
 		"global_fetch_strictly_public"
 	],
+
 	"assets": {
 		"binding": "ASSETS",
 		"directory": ".open-next/assets"
 	},
+
 	"images": {
 		// Enable image optimization
-		// see https://opennext.js.org/cloudflare/howtos/image
+		// https://opennext.js.org/cloudflare/howtos/image
 		"binding": "IMAGES"
 	},
+
 	"services": [
 		{
-			// Self-reference service binding, the service name must match the worker name
-			// see https://opennext.js.org/cloudflare/caching
+			// Self-reference service binding
+			// https://opennext.js.org/cloudflare/caching
 			"binding": "WORKER_SELF_REFERENCE",
 			"service": "waitlist"
 		}
 	],
+
+ "queues": {
+    "producers": [
+      {
+        "binding": "MY_QUEUE",
+        "queue": "nonnoapp-waitlistqueue"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "nonnoapp-waitlistqueue",
+        "max_batch_size": 10,
+        "dead_letter_queue": "my-queue-dlq"
+      }
+    ]
+  },
+
 	"observability": {
 		"enabled": true
 	},
+
 	"upload_source_maps": true
+
 	/**
 	 * Smart Placement
-	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
+	 * https://developers.cloudflare.com/workers/configuration/smart-placement/
 	 */
-	// "placement": {  "mode": "smart" }
-	/**
-	 * Bindings
-	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
-	 * databases, object storage, AI inference, real-time communication and more.
-	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
-	 */
+	// "placement": {
+	//   "mode": "smart"
+	// }
+
 	/**
 	 * Environment Variables
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
-	 * Note: Use secrets to store sensitive data.
-	 * https://developers.cloudflare.com/workers/configuration/secrets/
+	 * https://developers.cloudflare.com/workers/configuration/#environment-variables
 	 */
-	// "vars": {  "MY_VARIABLE": "production_value" }
+	// "vars": {
+	//   "MY_VARIABLE": "production_value"
+	// }
 }
